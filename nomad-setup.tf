@@ -1,4 +1,4 @@
-module "nomad-servers" {
+module "servers" {
   source = "./nomad"
 
   namespace = "${var.namespace}-server"
@@ -19,7 +19,7 @@ module "nomad-servers" {
   hashiui_version = "${var.hashiui_version}"
 }
 
-module "nomad-clients" {
+module "clients" {
   source = "./nomad"
 
   namespace = "${var.namespace}-client"
