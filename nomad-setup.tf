@@ -1,41 +1,49 @@
 module "servers" {
   source = "./nomad"
 
-  namespace = "${var.namespace}-server"
-  instances = "${var.nomad_servers}"
+  namespace     = "${var.namespace}-server"
+  zone          = "${var.zone}"
+  min_instances = "${var.min_servers}"
+  max_instances = "${var.max_servers}"
+  instance_type = "${var.instance_type}"
+
+  network_name = "${var.vpc_id}"
+  key_name     = "${var.key_name}"
 
   consul_enabled        = true
   consul_type           = "server"
   consul_version        = "${var.consul_version}"
   consul_join_tag_key   = "${var.consul_join_tag_key}"
   consul_join_tag_value = "${var.consul_join_tag_value}"
-  consul_wan            = "${var.consul_wan}"
 
-  nomad_enabled = true
-  nomad_type    = "server"
-  nomad_version = "${var.nomad_version}"
-
-  hashiui_enabled = false
-  hashiui_version = "${var.hashiui_version}"
+  nomad_datacentre = "${var.nomad_datacentre}"
+  nomad_region     = "${var.nomad_region}"
+  nomad_enabled    = true
+  nomad_type       = "server"
+  nomad_version    = "${var.nomad_version}"
 }
 
-module "clients" {
+module "client" {
   source = "./nomad"
 
-  namespace = "${var.namespace}-client"
-  instances = "${var.nomad_agents}"
+  namespace     = "${var.namespace}-client"
+  zone          = "${var.zone}"
+  min_instances = "${var.min_agents}"
+  max_instances = "${var.max_agents}"
+  instance_type = "${var.instance_type}"
+
+  network_name = "${var.vpc_id}"
+  key_name     = "${var.key_name}"
 
   consul_enabled        = true
   consul_type           = "client"
   consul_version        = "${var.consul_version}"
   consul_join_tag_key   = "${var.consul_join_tag_key}"
   consul_join_tag_value = "${var.consul_join_tag_value}"
-  consul_wan            = "${var.consul_wan}"
 
-  nomad_enabled = true
-  nomad_type    = "client"
-  nomad_version = "${var.nomad_version}"
-
-  hashiui_enabled = true
-  hashiui_version = "${var.hashiui_version}"
+  nomad_datacentre = "${var.nomad_datacentre}"
+  nomad_region     = "${var.nomad_region}"
+  nomad_enabled    = true
+  nomad_type       = "client"
+  nomad_version    = "${var.nomad_version}"
 }

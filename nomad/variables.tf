@@ -1,7 +1,27 @@
 variable "namespace" {}
 
-variable "instances" {
-  description = "The number of nomad servers."
+variable "zone" {}
+
+variable "network_name" {
+  description = "name of the network to attach the instance to"
+}
+
+variable "instance_type" {
+  description = "Instance type to use when creating servers and nodes e.g 1-standard-1n"
+  default     = "1-standard-1n"
+}
+
+variable "source_image" {
+  description = "Base image to use when creating instances"
+  default     = "ubuntu-os-cloud/ubuntu-1604-lts"
+}
+
+variable "min_instances" {
+  description = "Minimum number of servers."
+}
+
+variable "max_instances" {
+  description = "Maximum number of nomad servers."
 }
 
 # Consul configuration
@@ -27,9 +47,15 @@ variable "consul_join_tag_value" {
 
 variable "consul_wan" {
   description = "Consul WAN address for joining clusters"
+  default     = ""
 }
 
-# Nomad configuration
+# Nomad settings
+variable "nomad_wan" {
+  description = "Consul WAN address for joining clusters"
+  default     = ""
+}
+
 variable "nomad_enabled" {
   description = "Is nomad enabled on this instance"
 }
@@ -47,16 +73,16 @@ variable "nomad_consul_uri" {
   default     = "http://localhost:8500"
 }
 
-variable "public_key_path" {
+variable "nomad_datacentre" {
+  description = "Default datacenter for Nomad"
+  default     = "dc1"
+}
+
+variable "nomad_region" {
+  description = "Default datacenter for Nomad"
+  default     = "gcp"
+}
+
+variable "key_name" {
   description = "The absolute path on disk to the SSH public key."
-  default     = "~/.ssh/id_rsa.pub"
-}
-
-# HashiUI configuration
-variable "hashiui_enabled" {
-  description = "Is HashiUI enabled on this instance"
-}
-
-variable "hashiui_version" {
-  description = "Version number for hashi-ui"
 }

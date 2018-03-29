@@ -1,22 +1,39 @@
 # Generic
-variable "public_key_path" {
-  description = "The absolute path on disk to the SSH public key."
-  default     = "~/.ssh/id_rsa.pub"
+variable "instance_type" {
+  default = "n1-standard-1"
 }
 
-variable "instance_type" {
-  default = "t2.micro"
+variable "zone" {
+  description = "Zone to launch instances into"
 }
 
 variable "namespace" {
-  description = <<EOH
-The namespace to create the virtual training lab. This should describe the
-training and must be unique to all current trainings. IAM users, workstations,
-and resources will be scoped under this namespace.
+  description = "Namespace for application, all resources will be prefixed with namespace"
+}
 
-It is best if you add this to your .tfvars file so you do not need to type
-it manually with each run
-EOH
+variable "min_servers" {
+  description = "The minimum number of servers to add to the autoscale group"
+}
+
+variable "max_servers" {
+  description = "The maximum number of servers allowed in the autoscale group"
+}
+
+variable "min_agents" {
+  description = "The minimum number of agents to add to the autoscale group"
+}
+
+variable "max_agents" {
+  description = "The maximum number of agents allowed in the autoscale group"
+}
+
+# Networking
+variable "vpc_id" {
+  description = "Name of the network to attach instances to"
+}
+
+variable "key_name" {
+  description = "SSH key to add to instances"
 }
 
 # Consul settings
@@ -36,36 +53,21 @@ variable "consul_enabled" {
   description = "Is consul enabled on this instance"
 }
 
-variable "consul_wan" {
-  description = "Consul WAN address for joining clusters"
+# Nomad settings
+variable "nomad_datacentre" {
+  description = "Default datacenter for Nomad"
+  default     = "dc1"
 }
 
-# Nomad settings
-variable "nomad_servers" {
-  description = "The number of nomad servers."
+variable "nomad_region" {
+  description = "Default datacenter for Nomad"
+  default     = "gcp"
 }
 
 variable "nomad_enabled" {
   description = "Is nomad enabled on this instance"
 }
 
-variable "nomad_agents" {
-  description = "The number of nomad agents"
-}
-
 variable "nomad_version" {
   description = "Nomad version to install"
-}
-
-# HashiUI configuration
-variable "hashiui_enabled" {
-  description = "Is HashiUI enabled on this instance"
-}
-
-variable "hashiui_version" {
-  description = "Version number for hashi-ui"
-}
-
-variable "gcp_region" {
-  description = "region for GCP"
 }

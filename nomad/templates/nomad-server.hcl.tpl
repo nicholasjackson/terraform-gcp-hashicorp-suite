@@ -1,6 +1,6 @@
 data_dir   = "/mnt/nomad"
-datacenter = "gcp"
-region = "gcp"
+datacenter = "${datacenter}"
+region     = "${region}"
 
 bind_addr = "0.0.0.0"
 

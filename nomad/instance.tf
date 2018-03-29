@@ -2,7 +2,8 @@ data "template_file" "config_consul" {
   template = "${file("${path.module}/templates/consul-${var.consul_type}.json.tpl")}"
 
   vars {
-    instances             = "${var.instances}"
+    instances             = "${var.min_instances}"
+    datacenter            = "${var.nomad_datacentre}"
     consul_join_tag_value = "${var.consul_join_tag_key}"
     consul_wan            = "${var.consul_wan}"
   }
@@ -12,7 +13,9 @@ data "template_file" "config_nomad" {
   template = "${file("${path.module}/templates/nomad-${var.nomad_type}.hcl.tpl")}"
 
   vars {
-    instances = "${var.instances}"
+    instances  = "${var.min_instances}"
+    datacenter = "${var.nomad_datacentre}"
+    region     = "${var.nomad_region}"
   }
 }
 
@@ -33,23 +36,20 @@ data "template_file" "startup" {
     nomad_type = "${var.nomad_type}"
 
     nomad_config = "${data.template_file.config_nomad.rendered}"
-
-    hashiui_enabled = "${var.hashiui_enabled}"
-    hashiui_version = "${var.hashiui_version}"
   }
 }
 
 resource "google_compute_instance_template" "nomad" {
   name           = "nomad-cluster-${var.nomad_type}"
-  machine_type   = "n1-standard-1"
+  machine_type   = "${var.instance_type}"
   can_ip_forward = false
 
   disk {
-    source_image = "ubuntu-os-cloud/ubuntu-1604-lts"
+    source_image = "${var.source_image}"
   }
 
   network_interface {
-    network = "default"
+    network = "${var.network_name}"
 
     access_config {}
   }
@@ -57,7 +57,7 @@ resource "google_compute_instance_template" "nomad" {
   tags = ["${var.consul_join_tag_key}"]
 
   metadata {
-    sshKeys = "nicj:${file(var.public_key_path)}"
+    sshKeys = "ubuntu:${file(var.key_name)}"
   }
 
   metadata_startup_script = "${data.template_file.startup.rendered}"
@@ -75,7 +75,7 @@ resource "google_compute_target_pool" "nomad" {
 
 resource "google_compute_instance_group_manager" "nomad" {
   name = "nomad-${var.nomad_type}"
-  zone = "us-central1-f"
+  zone = "${var.zone}"
 
   instance_template  = "${google_compute_instance_template.nomad.self_link}"
   target_pools       = ["${google_compute_target_pool.nomad.self_link}"]
@@ -84,12 +84,12 @@ resource "google_compute_instance_group_manager" "nomad" {
 
 resource "google_compute_autoscaler" "nomad" {
   name   = "nomad-${var.nomad_type}"
-  zone   = "us-central1-f"
+  zone   = "${var.zone}"
   target = "${google_compute_instance_group_manager.nomad.self_link}"
 
   autoscaling_policy = {
-    max_replicas    = 5
-    min_replicas    = "${var.instances}"
+    max_replicas    = "${var.max_instances}"
+    min_replicas    = "${var.min_instances}"
     cooldown_period = 60
 
     cpu_utilization {

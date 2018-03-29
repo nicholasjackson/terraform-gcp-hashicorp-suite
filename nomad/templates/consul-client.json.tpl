@@ -1,5 +1,5 @@
 {
-  "datacenter": "gcp",
+  "datacenter": "${datacenter}",
   "bind_addr": "0.0.0.0",
   "advertise_addr": "$PRIVATE_IP",
   "advertise_addr_wan": "$PRIVATE_IP",
@@ -10,8 +10,6 @@
   "disable_remote_exec": true,
   "disable_update_check": true,
   "leave_on_terminate": true,
-  "retry_join_gce": {
-    "tag_value": "${consul_join_tag_value}"
-  },
+  "retry_join": ["provider=gce tag_value=${consul_join_tag_value}"],
   "server": false
 }
